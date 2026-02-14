@@ -2,13 +2,15 @@ package com.clinica.seguridad.service;
 
 import com.clinica.seguridad.model.Usuario;
 import com.clinica.seguridad.model.dto.LoginInputDTO;
+import com.clinica.seguridad.model.dto.RegistrarUsuarioInputDTO;
+import com.clinica.seguridad.model.dto.GenericOutputDTO;
 import com.clinica.seguridad.repository.UsuarioRepository;
+import com.clinica.seguridad.util.BCryptUtil;
+import com.clinica.seguridad.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,19 +18,41 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements  UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final JwtUtil jwtUtil;
+    private final BCryptUtil bCryptUtil;
 
     @Override
-    public Usuario createUsuario(Usuario usuario) {
-        return null;
+    public GenericOutputDTO createUsuario(RegistrarUsuarioInputDTO inputDTO) {
+        Usuario usuario = new Usuario();
+        usuario.setNombreUsuario(inputDTO.nombreUsuario());
+        usuario.setClaveUsuario(inputDTO.claveUsuario());
+        usuario.setNombres(inputDTO.nombres());
+        usuario.setApellidoPaterno(inputDTO.apellidoPaterno());
+        usuario.setApellidoMaterno(inputDTO.apellidoMaterno());
+        usuario.setDni(inputDTO.dni());
+        usuario.setCorreo(inputDTO.correo());
+        usuario.setClaveUsuario(bCryptUtil.encriptar(usuario.getClaveUsuario()));
+
+        try{
+            Usuario nuevo = usuarioRepository.save(usuario);
+            return new GenericOutputDTO(true, "Usuario registrado correctamente", nuevo);
+        }catch (Exception e){
+            return  new GenericOutputDTO(false, "Error al registrar usuario", null);
+        }
     }
 
     @Override
-    public Map<String, String> login(LoginInputDTO inputDTO) {
-        Optional<Usuario> usuario = usuarioRepository.getUsuarioByNombreUsuarioAndClaveUsuario(inputDTO.nombreUsuario(), inputDTO.claveUsuario());
-        if (usuario.isPresent()) {
-            return Map.of("token", jwtUtil.generarToken(inputDTO.nombreUsuario()));
+    public GenericOutputDTO login(LoginInputDTO inputDTO) {
+        Optional<Usuario> usuario = usuarioRepository.getUsuarioByNombreUsuario(inputDTO.nombreUsuario());
+        if (usuario.isPresent()){
+            if (bCryptUtil.validarPassword(inputDTO.claveUsuario(), usuario.get().getClaveUsuario())){
+                return new GenericOutputDTO(true, "Login correcto", JwtUtil.generateToken(inputDTO.nombreUsuario()));
+            }
         }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        return new GenericOutputDTO(false, "Verifique sus credenciales", null);
+    }
+
+    @Override
+    public List<Usuario> listar() {
+        return usuarioRepository.findAll();
     }
 }

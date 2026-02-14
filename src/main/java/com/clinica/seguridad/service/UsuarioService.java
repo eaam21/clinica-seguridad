@@ -2,11 +2,14 @@ package com.clinica.seguridad.service;
 
 import com.clinica.seguridad.model.Usuario;
 import com.clinica.seguridad.model.dto.LoginInputDTO;
+import com.clinica.seguridad.model.dto.RegistrarUsuarioInputDTO;
+import com.clinica.seguridad.model.dto.GenericOutputDTO;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface UsuarioService {
-    Usuario createUsuario(Usuario usuario);
-    Map<String, String> login(LoginInputDTO inputDTO);
+    GenericOutputDTO createUsuario(RegistrarUsuarioInputDTO inputDTO);
+    GenericOutputDTO login(LoginInputDTO inputDTO);
+    List<Usuario> listar();
 }
