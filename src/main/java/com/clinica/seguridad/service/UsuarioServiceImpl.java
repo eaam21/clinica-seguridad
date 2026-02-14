@@ -41,7 +41,7 @@ public class UsuarioServiceImpl implements  UsuarioService {
     }
 
     @Override
-    public GenericOutputDTO login(LoginInputDTO inputDTO) {
+    public GenericOutputDTO login(LoginInputDTO inputDTO) throws Exception {
         Optional<Usuario> usuario = usuarioRepository.getUsuarioByNombreUsuario(inputDTO.nombreUsuario());
         if (usuario.isPresent()){
             if (bCryptUtil.validarPassword(inputDTO.claveUsuario(), usuario.get().getClaveUsuario())){

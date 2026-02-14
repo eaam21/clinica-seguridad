@@ -28,7 +28,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public GenericOutputDTO loginUsuario(@RequestBody LoginInputDTO loginInputDTO) {
+    public GenericOutputDTO loginUsuario(@RequestBody LoginInputDTO loginInputDTO) throws Exception {
         return usuarioService.login(loginInputDTO);
     }
 }

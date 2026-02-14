@@ -10,6 +10,6 @@ import java.util.Map;
 
 public interface UsuarioService {
     GenericOutputDTO createUsuario(RegistrarUsuarioInputDTO inputDTO);
-    GenericOutputDTO login(LoginInputDTO inputDTO);
+    GenericOutputDTO login(LoginInputDTO inputDTO) throws Exception;
     List<Usuario> listar();
 }
